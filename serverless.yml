@@ -1,0 +1,45 @@
+service: zapia-bot
+frameworkVersion: "3"
+
+useDotenv: true 
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: sa-east-1	
+
+  environment:
+    SQS_URL: https://sqs.sa-east-1.amazonaws.com/025526518566/zapia.fifo
+    SQS_ARN: arn:aws:sqs:sa-east-1:025526518566:zapia.fifo
+    BOT_TOKEN: ****
+    BOT_CLIENT_ID: "1190519346708086954"
+    BOT_GLOBAL_LOG: "1191078084493975723"
+
+  iam:
+    role:
+      statements:
+        - Effect: 'Allow'
+          Resource: ${self:provider.environment.SQS_ARN}
+          Action: 
+            - 'sqs:SendMessage'
+            - 'sqs:ReceiveMessage'
+            - 'sqs:DeleteMessage'
+
+plugins:
+  - serverless-offline
+
+functions:
+  send-roll:
+    handler: handler.sendRoll
+    url: true
+    events:
+      - http:
+          path: /send-roll
+          method: post
+          cors: true
+  process-roll:
+    handler: handler.processRoll
+    events:
+      - sqs: ${self:provider.environment.SQS_ARN}
+  
+  

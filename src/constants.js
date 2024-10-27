@@ -1,0 +1,1 @@
+exports.SQS_MESSAGE_GROUP_ID = 'ZAPIA_ROLLS'
